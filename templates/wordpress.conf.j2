@@ -1,0 +1,28 @@
+ # Wordpress httpd configuration file
+
+ NameVirtualHost *:80
+
+ <VirtualHost *:80>
+   ServerName default
+   Redirect 404 /
+ </VirtualHost>
+
+ <IfModule !env_module>
+   LoadModule env_module modules/mod_env.so
+ </IfModule>
+
+ <IfModule !rewrite_module>
+   LoadModule rewrite_module modules/mod_rewrite.so
+ </IfModule>
+
+ <VirtualHost *:80>
+   DocumentRoot {{ wordpress_directory }}
+   ServerName {{ wordpress_servername }}
+ </VirtualHost>
+
+ <Directory {{ wordpress_directory }}>
+   Order allow,deny
+   Allow from all
+   Satisfy any
+   Require all granted
+ </Directory>

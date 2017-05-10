@@ -1,0 +1,14 @@
+---
+
+wordpress_directory: /var/wordpress
+wordpress_user: vagrant
+wordpress_version: 4.7.4
+wordpress_servername: wordpress.local
+
+wordpress_settings_configuration:
+  - regexp: "database_name_here"
+    line: "define('DB_NAME', 'wordpressdb');"
+  - regexp: "'username_here"
+    line: "define('DB_USER', 'root');"
+  - regexp: "password_here"
+    line: "define('DB_PASSWORD', 'MYSQL_ROOT_PASSWORD');"

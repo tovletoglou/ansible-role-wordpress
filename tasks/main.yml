@@ -1,0 +1,52 @@
+---
+
+- name: change owner
+  become: yes
+  file:
+    state: directory
+    path: "{{ wordpress_directory }}"
+    owner: "{{ wordpress_user }}"
+    group: "{{ wordpress_user }}"
+    mode: 0755
+
+- name: Clone WP
+  become: yes
+  become_user: "{{ wordpress_user }}"
+  git:
+    repo: 'https://github.com/WordPress/WordPress.git'
+    dest: "{{ wordpress_directory }}"
+    clone: yes
+    update: yes
+    version: "{{ wordpress_version }}"
+
+- name: Copy httpd template
+  become: yes
+  template:
+    src: wordpress.conf.j2
+    dest: /etc/httpd/conf.d/wordpress.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart httpd
+
+- name: Create a new database with name 'wordpressdb'
+  become: yes
+  mysql_db:
+    name: wordpressdb
+    state: present
+
+- name: Copy wp settings file
+  become: yes
+  become_user: "{{ wordpress_user }}"
+  copy:
+    remote_src: True
+    src: "{{ wordpress_directory }}/wp-config-sample.php"
+    dest: "{{ wordpress_directory }}/wp-config.php"
+
+- name: Configure wp settings
+  lineinfile:
+    dest: "{{ wordpress_directory }}/wp-config.php"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  with_items: "{{ wordpress_settings_configuration }}"
